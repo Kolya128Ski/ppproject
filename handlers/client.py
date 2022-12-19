@@ -25,6 +25,12 @@ dp = Dispatcher(bot, storage=storage)
 
 
 async def show_all_pr(callback: types.CallbackQuery, pr: list) -> None:#в данном случае pr является списком кортежей
+    '''
+    В данной функции реализуется вывод фотографии вместе с названием города
+    :param callback: types.CallbackQuery
+    :param pr: list
+    :return: None
+    '''
     for prod in pr:
         await bot.send_photo(chat_id=callback.message.chat.id, photo=prod[2], caption=prod[1], reply_markup=edit_ikb(prod[0]))
 
@@ -42,10 +48,21 @@ class FSMma(StatesGroup):
 #не забудь импортировать в будущем dp из config
 # @dp.message_handler(commands='Узнатьпогодувмоёмгороде', state=None)ccc
 async def fsm_start(message: types.Message):
+    '''
+    Данная функция принимает сообщзение и отвечает
+    :param message: types.Message
+    :return: message
+    '''
     # await FSMma.title.set()#запуск машины состояний
     await message.reply("Нажмите на одну из кнопок", reply_markup=get_pr_ikb())#ответ на сообщение
 
 async def close_command(message: types.Message, state=FSMContext):
+    '''
+        Данная функция принимает сообщзение и отвечает и запускается машина состояний
+        :param message: types.Message
+        :state: FSMContext
+        :return: message
+        '''
     if state is None:
         return
 
@@ -56,6 +73,11 @@ async def close_command(message: types.Message, state=FSMContext):
 
 # @dp.callback_query_handler(text='get_all_pr')#обработчик, который обрабатывает
 async def cb_get_all_pr(callback: types.CallbackQuery):
+    '''
+        Данная функция принимает сообщзение и отвечает
+        :param message: types.Message
+        :return: message
+        '''
     pr = await sqlite_db.get_all_pr()
 
     if not pr:
@@ -68,6 +90,11 @@ async def cb_get_all_pr(callback: types.CallbackQuery):
 
 # @dp.callback_query_handler(command="Посмотреть мои города")
 async def cb_add_new_pr(callback: types.CallbackQuery) -> None:
+    '''
+        Данная функция принимает сообщзение и отвечает
+        :param message: types.Message
+        :return: message
+        '''
     await callback.message.delete()
     await callback.message.answer('Отправь название города', reply_markup=get_cancel_kb())
     await FSMma.title.set()#устанавливаем состояние для нашего алгоритма
@@ -75,7 +102,17 @@ async def cb_add_new_pr(callback: types.CallbackQuery) -> None:
     # sqlite_db.create_new_pr()
     #ecnfyfdkbdftv cjcjzybt(важно)
 async def handle_title(message: types.Message, state: FSMContext) -> None:
+    '''
+        Данная функция принимает сообщзение и отвечает
+        :param message: types.Message
+        :return: message
+        '''
     async with state.proxy() as data:#тут мы работаем с контекстом(сохраняем фотографию)data будет являться словарем, который хранит значение
+        '''
+            Данная функция принимает сообщзение и отвечает
+            :param message: types.Message
+            :return: message
+            '''
         data['title']=message.text
 
     await message.reply('Отправь фотогрфию города')
@@ -84,10 +121,20 @@ async def handle_title(message: types.Message, state: FSMContext) -> None:
 
 # @dp.message_handler(lambda message: not message.photo, state=FSMma.photo)#проверка является ли фотография фотографией
 async def check_photo(message: types.Message):
+    '''
+        Данная функция принимает сообщзение и отвечает
+        :param message: types.Message
+        :return: message
+        '''
     await message.reply('Это не фотография')
 
 # @dp.message_handler(content_types=["photo"], state=FSMma.photo)
 async def handle_photo(message: types.Message, state: FSMContext) -> None:#именно тут будет(в этой функции) завершатся состояние
+    '''
+        Данная функция принимает сообщзение и отвечает
+        :param message: types.Message
+        :return: message
+        '''
     async with state.proxy() as data:#тут мы работаем с контекстом(сохраняем фотографию)data будет являться словарем, который хранит значение
         data['photo']=message.photo[0].file_id
 
@@ -99,6 +146,12 @@ async def handle_photo(message: types.Message, state: FSMContext) -> None:#им�
 
 products_cb.filter(action='delete')
 async def del_pr(callback: types.CallbackQuery, callback_data: dict):#dictionary types
+    '''
+    Данная функция удаляет из базы фотографию и название города
+    :param callback: types.CallbackQuery
+    :param callback_data: dist
+    :return:
+    '''
     await sqlite_db.delete_pr(callback_data['id'])
 
     await callback.message.reply('Успешно удалён')
@@ -106,6 +159,12 @@ async def del_pr(callback: types.CallbackQuery, callback_data: dict):#dictionary
 
 # @dp.message_handler(state = FSMma.name)
 async def load_name(message: types.Message, state: FSMContext):
+    '''
+        Данная функция сохраняет себя и название нового города
+        :param callback: types.CallbackQuery
+        state: FSMContext
+        :return: message
+        '''
     async with state.proxy() as data:
         data['name'] = message.text
         #воткнуть базу данных и сбросить состояния
@@ -119,17 +178,31 @@ async def load_name(message: types.Message, state: FSMContext):
 
 # @dp.message_handler(commands=['start'])       #если в чат кто-то написал это событие будет отображено
 async def start_command(message: types.Message):  # это специальная асинхронная
+    '''
+    Принимает и возвращает сообщение
+    :param message: message
+    :return: message
+    '''
     await bot.send_message(message.from_user.id, 'Здравствуйте! Что Вы хотите узнать?', reply_markup=clientkaa)  # Бот отвечает на наше сообщение /start
 
 
 # @dp.message_handler(commands=['Погода'])       #если в чат кто-то написал это событие будет отображено
 async def w_command(message: types.Message):  # это специальная асинхронная
+    '''
+        Принимает и возвращает сообщение
+        :param message: message
+        :return: message
+        '''
     await bot.send_message(message.from_user.id, 'Здравствуйте! Введите город, в котором хотите узнать погоду', reply_markup=clientkaa)
 
 
 # @dp.message_handler(lambga message: 'шутки'in message.text)
 async def joke_command(message: types.Message):
-    """функция принимает в себя сообщение, ипроверяет айди человека"""
+    '''
+    Принимает и возвращает сообщение
+    :param message: message
+    :return: message
+    '''
 
 
     await bot.send_message(message.from_user.id, 'В сторону шутки. Я погоду предсказываю!', reply_markup=clientkaa)
@@ -137,6 +210,11 @@ async def joke_command(message: types.Message):
 #pytest-asyncio
 # @dp.message_handler(commands=['Любимые города'])
 async def like_command(message: types.Message):
+    '''
+        Принимает и возвращает сообщение
+        :param message: message
+        :return: message
+        '''
     await message.answer('Как только вы добавите ваш город, он будет отобржатся здесь.', reply_markup=clientkaa)
     await message.answer('Введите Ваш город')
 

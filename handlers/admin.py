@@ -13,11 +13,21 @@ cg = CoinGeckoAPI()
 
 # @dp.message_handler(command=['    dp.register_message_handler(cr_start, commands=['rypto.rates'])    dp.register_message_handler(cr_start, commands=['rypto.rates'])'])
 async def cr_start(message: types.Message):
+    '''
+            Принимает и возвращает сообщение
+            :param message: message
+            :return: message
+            '''
     if message.chat.type == 'private':
         await bot.send_message(message.from_user.id, "Выберите криптовалюту:", reply_markup=cripto_list)
 
 # @dp.callback_query_handler(text_contains="cc_")
 async def crupto(call: types.CallbackQuery):
+    '''
+            Принимает и возвращает сообщение
+            :param message: message
+            :return: message
+            '''
     await bot.send_message('подумать')
     # await bot.delete_message(call.from_user.id, call.message.message_id)
     callback_data = call.data
@@ -29,6 +39,7 @@ async def crupto(call: types.CallbackQuery):
 
 
 def register_handlers_admin(dp: Dispatcher):
+
     dp.register_message_handler(cr_start, commands=['Cryptorates'])
     dp.callback_query_handler(crupto, text_contains="cc/")
 
